@@ -3,181 +3,529 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="AI-powered resume analysis tool for deep candidate evaluation and skill matching">
     <title>Professional AI Resume Analyzer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
     <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <header>
-        <h1>AI Resume Analyzer</h1>
+    <header class="main-header">
+        <div class="header-content">
+            <h1 class="main-title">
+                <span class="title-icon">🤖</span>
+                AI Resume Analyzer
+            </h1>
+            <p class="header-subtitle">Professional-grade candidate evaluation powered by advanced AI</p>
+        </div>
     </header>
-    <main>
+
+    <main class="main-content">
         <div class="container">
-            <div id="upload-section">
-                <p class="description">
-                    Upload a resume and job description to begin a deep, multi-stage AI analysis of the candidate's profile, skills, and experience.
-                </p>
-                <form id="analyzer-form">
-                    <div class="form-group">
-                        <label for="resume">Upload Resume</label>
-                        <input type="file" id="resume" name="resume" accept=".pdf,.txt" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="jd">Paste Job Description</label>
-                        <textarea id="jd" name="jd" rows="10" placeholder="Paste the full job description here..." required></textarea>
-                    </div>
-                    <button type="submit">Analyze</button>
-                </form>
-            </div>
-
-            <div id="loading-section" class="hidden">
-                <h2><span class="spinner-inline"></span> Performing Deep AI Analysis...</h2>
-                <ul class="analysis-steps">
-                    <li id="step-1"><span></span> Analyzing Document Layout</li>
-                    <li id="step-2"><span></span> Extracting Key Information</li>
-                    <li id="step-3"><span></span> Performing Semantic Matching</li>
-                    <li id="step-4"><span></span> Modeling Experience Topics</li>
-                    <li id="step-5"><span></span> Identifying Key Concepts</li>
-                    <li id="step-6"><span></span> Building Skill Network</li>
-                    <li id="step-7"><span></span> Generating Final Report</li>
-                </ul>
-            </div>
-
-            <div id="results-container" class="hidden">
+            <!-- Upload Section -->
+            <section id="upload-section" class="upload-section">
+                <div class="section-header">
+                    <h2>Get Started</h2>
+                    <p class="description">
+                        Upload a resume and job description to begin a comprehensive AI analysis of the candidate's profile, skills, and experience.
+                    </p>
                 </div>
+                
+                <form id="analyzer-form" class="analyzer-form" enctype="multipart/form-data">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="resume" class="form-label">
+                                <span class="label-icon">📄</span>
+                                Resume File
+                            </label>
+                            <div class="file-input-wrapper">
+                                <input type="file" id="resume" name="resume" accept=".pdf,.txt,.doc,.docx" required 
+                                       class="file-input" aria-describedby="resume-help">
+                                <div class="file-input-placeholder">
+                                    <span class="file-icon">📁</span>
+                                    <span class="file-text">Choose file or drag & drop</span>
+                                </div>
+                            </div>
+                            <small id="resume-help" class="form-help">Supported formats: PDF, TXT, DOC, DOCX (Max 10MB)</small>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="jd" class="form-label">
+                                <span class="label-icon">💼</span>
+                                Job Description
+                            </label>
+                            <textarea id="jd" name="jd" rows="8" 
+                                      placeholder="Paste the complete job description here to enable skill matching and gap analysis..." 
+                                      required class="form-textarea" aria-describedby="jd-help"></textarea>
+                            <small id="jd-help" class="form-help">Include detailed requirements, responsibilities, and preferred qualifications</small>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary">
+                            <span class="btn-icon">🚀</span>
+                            Start AI Analysis
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- Loading Section -->
+            <section id="loading-section" class="loading-section hidden">
+                <div class="loading-content">
+                    <div class="loading-header">
+                        <div class="loading-spinner"></div>
+                        <h2>Performing Deep AI Analysis</h2>
+                        <p>Our AI is analyzing your documents through multiple stages...</p>
+                    </div>
+                    
+                    <div class="analysis-progress">
+                        <ol class="analysis-steps" role="progressbar" aria-label="Analysis progress">
+                            <li id="step-1" class="step-item">
+                                <span class="step-indicator"></span>
+                                <span class="step-text">Analyzing Document Layout</span>
+                            </li>
+                            <li id="step-2" class="step-item">
+                                <span class="step-indicator"></span>
+                                <span class="step-text">Extracting Key Information</span>
+                            </li>
+                            <li id="step-3" class="step-item">
+                                <span class="step-indicator"></span>
+                                <span class="step-text">Performing Semantic Matching</span>
+                            </li>
+                            <li id="step-4" class="step-item">
+                                <span class="step-indicator"></span>
+                                <span class="step-text">Modeling Experience Topics</span>
+                            </li>
+                            <li id="step-5" class="step-item">
+                                <span class="step-indicator"></span>
+                                <span class="step-text">Identifying Key Concepts</span>
+                            </li>
+                            <li id="step-6" class="step-item">
+                                <span class="step-indicator"></span>
+                                <span class="step-text">Building Skill Network</span>
+                            </li>
+                            <li id="step-7" class="step-item">
+                                <span class="step-indicator"></span>
+                                <span class="step-text">Generating Final Report</span>
+                            </li>
+                        </ol>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Container -->
+            <section id="results-container" class="results-section hidden" aria-live="polite">
+                <!-- Results will be dynamically populated -->
+            </section>
             
-            <div id="error-container" class="hidden"><p></p></div>
+            <!-- Error Container -->
+            <section id="error-container" class="error-section hidden" role="alert" aria-live="assertive">
+                <div class="error-content">
+                    <div class="error-icon">⚠️</div>
+                    <div class="error-message">
+                        <h3>Analysis Failed</h3>
+                        <p id="error-text"></p>
+                    </div>
+                    <button class="btn btn-secondary" onclick="resetForm()">Try Again</button>
+                </div>
+            </section>
         </div>
     </main>
 
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="footer-content">
+            <p>&copy; 2024 AI Resume Analyzer. Built with advanced NLP and machine learning.</p>
+        </div>
+    </footer>
+
     <script src="{{ url_for('static', filename='js/network.js') }}"></script>
     <script>
-        const form = document.getElementById('analyzer-form');
-        const uploadSection = document.getElementById('upload-section');
-        const loadingSection = document.getElementById('loading-section');
-        const resultsContainer = document.getElementById('results-container');
-        const errorContainer = document.getElementById('error-container');
-        const analysisSteps = document.querySelectorAll('.analysis-steps li');
-
-        form.addEventListener('submit', async function(event) {
-            event.preventDefault();
-            const formData = new FormData(form);
-
-            uploadSection.classList.add('hidden');
-            resultsContainer.classList.add('hidden');
-            errorContainer.classList.add('hidden');
-            loadingSection.classList.remove('hidden');
-            
-            let step = 0;
-            for(const li of analysisSteps) { li.className = ''; }
-
-            const stepInterval = setInterval(() => {
-                if (step < analysisSteps.length) {
-                    analysisSteps[step].className = 'in-progress';
-                    if (step > 0) { analysisSteps[step-1].className = 'done'; }
-                    step++;
-                }
-            }, 600);
-
-            try {
-                const response = await fetch('/api/analyze', { method: 'POST', body: formData });
-                const data = await response.json();
-
-                clearInterval(stepInterval);
-                for(let i = 0; i < analysisSteps.length; i++) { analysisSteps[i].className = 'done'; }
-
-                if (!response.ok) throw new Error(data.error || 'An unknown error occurred.');
-
-                setTimeout(() => {
-                    loadingSection.classList.add('hidden');
-                    displayResults(data);
-                    resultsContainer.classList.remove('hidden');
-                }, 500);
-
-            } catch (error) {
-                clearInterval(stepInterval);
-                loadingSection.classList.add('hidden');
-                errorContainer.querySelector('p').textContent = `Analysis Failed: ${error.message}`;
-                errorContainer.classList.remove('hidden');
-                uploadSection.classList.remove('hidden');
+        // Enhanced JavaScript with better error handling and user experience
+        class ResumeAnalyzer {
+            constructor() {
+                this.initializeElements();
+                this.bindEvents();
+                this.currentStep = 0;
+                this.stepInterval = null;
             }
-        });
 
-        function displayResults(data) {
-            resultsContainer.innerHTML = `
-                <div class="dashboard-header">
-                    <h2>Analysis Dashboard</h2>
-                    <button id="new-analysis-btn">Analyze New Resume</button>
-                </div>
-                <div class="results-grid">
-                    <div class="info-card">
-                        <h3>Candidate Profile</h3>
-                        <p><strong>Name:</strong> ${data.basic_info.name}</p>
-                        <p><strong>Email:</strong> ${data.basic_info.email}</p>
-                        <p><strong>Phone:</strong> ${data.basic_info.phone}</p>
-                        <p><strong>Pages:</strong> ${data.basic_info.pages}</p>
-                    </div>
-                    <div class="score-card">
-                        <h3>Match Score</h3>
-                        <p>${data.similarity_score}%</p>
-                        <small>Semantic similarity with JD</small>
-                    </div>
-                    <div class="info-card">
-                        <h3>Language Sentiment</h3>
-                        <p class="sentiment-${data.sentiment.label.toLowerCase().replace(' ', '')}">${data.sentiment.label}</p>
-                        <small>${data.sentiment.description}</small>
-                    </div>
-                </div>
+            initializeElements() {
+                this.form = document.getElementById('analyzer-form');
+                this.uploadSection = document.getElementById('upload-section');
+                this.loadingSection = document.getElementById('loading-section');
+                this.resultsContainer = document.getElementById('results-container');
+                this.errorContainer = document.getElementById('error-container');
+                this.analysisSteps = document.querySelectorAll('.analysis-steps .step-item');
+                this.fileInput = document.getElementById('resume');
+                this.filePlaceholder = document.querySelector('.file-input-placeholder');
+            }
 
-                <div class="results-section">
-                    <h3>Skills Analysis</h3>
-                    <div class="results-grid">
-                        <div class="skills-card">
-                            <h4>✅ Current Skills</h4>
-                            <div class="skill-list">${data.resume_skills.length > 0 ? data.resume_skills.map(s => `<span>${s}</span>`).join('') : '<p>No specific technical skills found.</p>'}</div>
+            bindEvents() {
+                this.form.addEventListener('submit', this.handleSubmit.bind(this));
+                this.fileInput.addEventListener('change', this.handleFileSelect.bind(this));
+                this.fileInput.addEventListener('dragover', this.handleDragOver.bind(this));
+                this.fileInput.addEventListener('drop', this.handleDrop.bind(this));
+            }
+
+            handleFileSelect(event) {
+                const file = event.target.files[0];
+                if (file) {
+                    this.updateFileDisplay(file.name);
+                }
+            }
+
+            handleDragOver(event) {
+                event.preventDefault();
+                this.filePlaceholder.classList.add('drag-over');
+            }
+
+            handleDrop(event) {
+                event.preventDefault();
+                this.filePlaceholder.classList.remove('drag-over');
+                const files = event.dataTransfer.files;
+                if (files.length > 0) {
+                    this.fileInput.files = files;
+                    this.updateFileDisplay(files[0].name);
+                }
+            }
+
+            updateFileDisplay(fileName) {
+                this.filePlaceholder.innerHTML = `
+                    <span class="file-icon">📄</span>
+                    <span class="file-text">${fileName}</span>
+                `;
+                this.filePlaceholder.classList.add('file-selected');
+            }
+
+            async handleSubmit(event) {
+                event.preventDefault();
+                
+                if (!this.validateForm()) {
+                    return;
+                }
+
+                const formData = new FormData(this.form);
+                this.showLoadingState();
+                this.startProgressAnimation();
+
+                try {
+                    const response = await fetch('/api/analyze', { 
+                        method: 'POST', 
+                        body: formData 
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (!response.ok) {
+                        throw new Error(data.error || 'An unknown error occurred during analysis.');
+                    }
+
+                    this.completeProgressAnimation();
+                    this.showResults(data);
+
+                } catch (error) {
+                    this.handleError(error);
+                }
+            }
+
+            validateForm() {
+                const resume = this.fileInput.files[0];
+                const jd = document.getElementById('jd').value.trim();
+
+                if (!resume) {
+                    this.showFieldError('resume', 'Please select a resume file.');
+                    return false;
+                }
+
+                if (!jd) {
+                    this.showFieldError('jd', 'Please enter a job description.');
+                    return false;
+                }
+
+                // File size validation (10MB limit)
+                if (resume.size > 10 * 1024 * 1024) {
+                    this.showFieldError('resume', 'File size must be less than 10MB.');
+                    return false;
+                }
+
+                return true;
+            }
+
+            showFieldError(fieldId, message) {
+                const field = document.getElementById(fieldId);
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'field-error';
+                errorDiv.textContent = message;
+                
+                // Remove existing error
+                const existingError = field.parentNode.querySelector('.field-error');
+                if (existingError) {
+                    existingError.remove();
+                }
+                
+                field.parentNode.appendChild(errorDiv);
+                field.classList.add('error');
+                
+                // Auto-remove error after 5 seconds
+                setTimeout(() => {
+                    errorDiv.remove();
+                    field.classList.remove('error');
+                }, 5000);
+            }
+
+            showLoadingState() {
+                this.uploadSection.classList.add('hidden');
+                this.resultsContainer.classList.add('hidden');
+                this.errorContainer.classList.add('hidden');
+                this.loadingSection.classList.remove('hidden');
+            }
+
+            startProgressAnimation() {
+                this.currentStep = 0;
+                this.analysisSteps.forEach(step => step.className = 'step-item');
+                
+                this.stepInterval = setInterval(() => {
+                    if (this.currentStep < this.analysisSteps.length) {
+                        if (this.currentStep > 0) {
+                            this.analysisSteps[this.currentStep - 1].classList.add('completed');
+                        }
+                        this.analysisSteps[this.currentStep].classList.add('active');
+                        this.currentStep++;
+                    }
+                }, 800);
+            }
+
+            completeProgressAnimation() {
+                if (this.stepInterval) {
+                    clearInterval(this.stepInterval);
+                }
+                
+                this.analysisSteps.forEach(step => {
+                    step.classList.remove('active');
+                    step.classList.add('completed');
+                });
+            }
+
+            showResults(data) {
+                setTimeout(() => {
+                    this.loadingSection.classList.add('hidden');
+                    this.displayResults(data);
+                    this.resultsContainer.classList.remove('hidden');
+                }, 1000);
+            }
+
+            handleError(error) {
+                if (this.stepInterval) {
+                    clearInterval(this.stepInterval);
+                }
+                
+                this.loadingSection.classList.add('hidden');
+                this.errorContainer.querySelector('#error-text').textContent = error.message;
+                this.errorContainer.classList.remove('hidden');
+                this.uploadSection.classList.remove('hidden');
+            }
+
+            displayResults(data) {
+                this.resultsContainer.innerHTML = `
+                    <div class="dashboard-header">
+                        <div class="dashboard-title">
+                            <h2>Analysis Dashboard</h2>
+                            <p class="dashboard-subtitle">Comprehensive evaluation results</p>
                         </div>
-                        <div class="skills-card">
-                            <h4>❌ Skill Gaps (from JD)</h4>
-                            <div class="skill-list">${data.missing_skills.length > 0 ? data.missing_skills.map(s => `<span>${s}</span>`).join('') : '<p>No skill gaps identified.</p>'}</div>
-                        </div>
+                        <button id="new-analysis-btn" class="btn btn-secondary">
+                            <span class="btn-icon">🔄</span>
+                            New Analysis
+                        </button>
                     </div>
-                </div>
 
-                <div class="results-section">
-                    <h3>Advanced Analysis</h3>
-                    <div class="results-grid">
-                        <div class="info-card">
-                            <h4>Key Experience Themes</h4>
-                            <div class="topic-list">
-                                ${data.experience_topics.length > 0 ? data.experience_topics.map(topic => `<div class="topic-tag">${topic}</div>`).join('') : '<p>Not enough text for topic analysis.</p>'}
+                    <div class="results-overview">
+                        <div class="overview-card candidate-profile">
+                            <div class="card-header">
+                                <h3>👤 Candidate Profile</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="profile-item">
+                                    <span class="profile-label">Name:</span>
+                                    <span class="profile-value">${data.basic_info.name || 'Not specified'}</span>
+                                </div>
+                                <div class="profile-item">
+                                    <span class="profile-label">Email:</span>
+                                    <span class="profile-value">${data.basic_info.email || 'Not specified'}</span>
+                                </div>
+                                <div class="profile-item">
+                                    <span class="profile-label">Phone:</span>
+                                    <span class="profile-value">${data.basic_info.phone || 'Not specified'}</span>
+                                </div>
+                                <div class="profile-item">
+                                    <span class="profile-label">Pages:</span>
+                                    <span class="profile-value">${data.basic_info.pages || '1'}</span>
+                                </div>
                             </div>
                         </div>
-                        <div class="info-card">
-                            <h4>Key Concepts Found</h4>
-                            <div class="skill-list">${data.key_concepts.length > 0 ? data.key_concepts.map(c => `<span>${c}</span>`).join('') : '<p>No key concepts extracted.</p>'}</div>
+
+                        <div class="overview-card match-score">
+                            <div class="card-header">
+                                <h3>🎯 Match Score</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="score-display">
+                                    <span class="score-value">${data.similarity_score || 0}%</span>
+                                    <span class="score-label">Semantic similarity with JD</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="overview-card sentiment-analysis">
+                            <div class="card-header">
+                                <h3>💭 Language Sentiment</h3>
+                            </div>
+                            <div class="card-content">
+                                <div class="sentiment-display sentiment-${(data.sentiment?.label || 'neutral').toLowerCase().replace(' ', '')}">
+                                    <span class="sentiment-label">${data.sentiment?.label || 'Neutral'}</span>
+                                    <span class="sentiment-description">${data.sentiment?.description || 'No sentiment data available'}</span>
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="results-section wide-card">
-                    <h3>Interactive Skill Network</h3>
-                    <div id="skill-network"></div>
-                </div>
+                    <div class="results-detail">
+                        <div class="detail-section">
+                            <h3>🛠️ Skills Analysis</h3>
+                            <div class="skills-grid">
+                                <div class="skills-card current-skills">
+                                    <h4>✅ Current Skills</h4>
+                                    <div class="skill-list">
+                                        ${this.renderSkills(data.resume_skills || [], 'current')}
+                                    </div>
+                                </div>
+                                <div class="skills-card missing-skills">
+                                    <h4>❌ Skill Gaps (from JD)</h4>
+                                    <div class="skill-list">
+                                        ${this.renderSkills(data.missing_skills || [], 'missing')}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section">
+                            <h3>🔍 Advanced Analysis</h3>
+                            <div class="analysis-grid">
+                                <div class="analysis-card">
+                                    <h4>🎯 Key Experience Themes</h4>
+                                    <div class="topic-list">
+                                        ${this.renderTopics(data.experience_topics || [])}
+                                    </div>
+                                </div>
+                                <div class="analysis-card">
+                                    <h4>💡 Key Concepts Found</h4>
+                                    <div class="concept-list">
+                                        ${this.renderConcepts(data.key_concepts || [])}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="detail-section wide-section">
+                            <h3>🌐 Interactive Skill Network</h3>
+                            <div class="network-container">
+                                <div id="skill-network" class="skill-network"></div>
+                                <div class="network-legend">
+                                    <div class="legend-item">
+                                        <span class="legend-color center"></span>
+                                        <span>Core Skills</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color skill"></span>
+                                        <span>Technical Skills</span>
+                                    </div>
+                                    <div class="legend-item">
+                                        <span class="legend-color category"></span>
+                                        <span>Categories</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="detail-section">
+                            <h3>💡 AI-Powered Resume Feedback</h3>
+                            <div class="feedback-container">
+                                <ul class="feedback-list">
+                                    ${this.renderFeedback(data.feedback_tips || [])}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                // Bind new analysis button
+                const newAnalysisBtn = document.getElementById('new-analysis-btn');
+                newAnalysisBtn.addEventListener('click', () => this.resetForm());
                 
-                <div class="results-section">
-                    <h3>AI-Powered Resume Feedback</h3>
-                    <ul class="feedback-list">${data.feedback_tips.map(tip => `<li>${tip}</li>`).join('')}</ul>
-                </div>
-            `;
+                // Render skill network
+                if (data.skill_network) {
+                    renderSkillNetwork(data.skill_network);
+                }
+            }
 
-            const newAnalysisBtn = document.getElementById('new-analysis-btn');
-            newAnalysisBtn.addEventListener('click', () => {
-                resultsContainer.classList.add('hidden');
-                uploadSection.classList.remove('hidden');
-                form.reset();
-            });
-            
-            renderSkillNetwork(data.skill_network);
+            renderSkills(skills, type) {
+                if (skills.length === 0) {
+                    return `<p class="no-data">No ${type === 'current' ? 'technical skills' : 'skill gaps'} identified.</p>`;
+                }
+                return skills.map(skill => `<span class="skill-tag skill-${type}">${skill}</span>`).join('');
+            }
+
+            renderTopics(topics) {
+                if (topics.length === 0) {
+                    return '<p class="no-data">Not enough text for topic analysis.</p>';
+                }
+                return topics.map(topic => `<div class="topic-tag">${topic}</div>`).join('');
+            }
+
+            renderConcepts(concepts) {
+                if (concepts.length === 0) {
+                    return '<p class="no-data">No key concepts extracted.</p>';
+                }
+                return concepts.map(concept => `<span class="concept-tag">${concept}</span>`).join('');
+            }
+
+            renderFeedback(feedback) {
+                if (feedback.length === 0) {
+                    return '<li class="no-data">No feedback available at this time.</li>';
+                }
+                return feedback.map(tip => `<li class="feedback-item">${tip}</li>`).join('');
+            }
+
+            resetForm() {
+                this.resultsContainer.classList.add('hidden');
+                this.errorContainer.classList.add('hidden');
+                this.uploadSection.classList.remove('hidden');
+                this.form.reset();
+                this.filePlaceholder.innerHTML = `
+                    <span class="file-icon">📁</span>
+                    <span class="file-text">Choose file or drag & drop</span>
+                `;
+                this.filePlaceholder.classList.remove('file-selected');
+                
+                // Clear any field errors
+                document.querySelectorAll('.field-error').forEach(error => error.remove());
+                document.querySelectorAll('.error').forEach(field => field.classList.remove('error'));
+            }
+        }
+
+        // Initialize the analyzer when DOM is loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            window.resumeAnalyzer = new ResumeAnalyzer();
+        });
+
+        // Global function for error handling
+        function resetForm() {
+            if (window.resumeAnalyzer) {
+                window.resumeAnalyzer.resetForm();
+            }
         }
     </script>
 </body>
