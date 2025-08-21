@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional AI Resume Analyzer</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script type="text/javascript" src="https://unpkg.com/vis-network/standalone/umd/vis-network.min.js"></script>
+</head>
+<body>
+    <header>
+        <h1>AI Resume Analyzer</h1>
+    </header>
+    <main>
+        <div class="container">
+            <div id="upload-section">
+                <p class="description">
+                    Upload a resume and job description to begin a deep, multi-stage AI analysis of the candidate's profile, skills, and experience.
+                </p>
+                <form id="analyzer-form">
+                    <div class="form-group">
+                        <label for="resume">Upload Resume</label>
+                        <input type="file" id="resume" name="resume" accept=".pdf,.txt" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="jd">Paste Job Description</label>
+                        <textarea id="jd" name="jd" rows="10" placeholder="Paste the full job description here..." required></textarea>
+                    </div>
+                    <button type="submit">Analyze</button>
+                </form>
+            </div>
+
+            <div id="loading-section" class="hidden">
+                <h2><span class="spinner-inline"></span> Performing Deep AI Analysis...</h2>
+                <ul class="analysis-steps">
+                    <li id="step-1"><span></span> Analyzing Document Layout</li>
+                    <li id="step-2"><span></span> Extracting Key Information</li>
+                    <li id="step-3"><span></span> Performing Semantic Matching</li>
+                    <li id="step-4"><span></span> Modeling Experience Topics</li>
+                    <li id="step-5"><span></span> Identifying Key Concepts</li>
+                    <li id="step-6"><span></span> Building Skill Network</li>
+                    <li id="step-7"><span></span> Generating Final Report</li>
+                </ul>
+            </div>
+
+            <div id="results-container" class="hidden">
+                </div>
+            
+            <div id="error-container" class="hidden"><p></p></div>
+        </div>
+    </main>
+
+    <script src="{{ url_for('static', filename='js/network.js') }}"></script>
+    <script>
+        const form = document.getElementById('analyzer-form');
+        const uploadSection = document.getElementById('upload-section');
+        const loadingSection = document.getElementById('loading-section');
+        const resultsContainer = document.getElementById('results-container');
+        const errorContainer = document.getElementById('error-container');
+        const analysisSteps = document.querySelectorAll('.analysis-steps li');
+
+        form.addEventListener('submit', async function(event) {
+            event.preventDefault();
+            const formData = new FormData(form);
+
+            uploadSection.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            errorContainer.classList.add('hidden');
+            loadingSection.classList.remove('hidden');
+            
+            let step = 0;
+            for(const li of analysisSteps) { li.className = ''; }
+
+            const stepInterval = setInterval(() => {
+                if (step < analysisSteps.length) {
+                    analysisSteps[step].className = 'in-progress';
+                    if (step > 0) { analysisSteps[step-1].className = 'done'; }
+                    step++;
+                }
+            }, 600);
+
+            try {
+                const response = await fetch('/api/analyze', { method: 'POST', body: formData });
+                const data = await response.json();
+
+                clearInterval(stepInterval);
+                for(let i = 0; i < analysisSteps.length; i++) { analysisSteps[i].className = 'done'; }
+
+                if (!response.ok) throw new Error(data.error || 'An unknown error occurred.');
+
+                setTimeout(() => {
+                    loadingSection.classList.add('hidden');
+                    displayResults(data);
+                    resultsContainer.classList.remove('hidden');
+                }, 500);
+
+            } catch (error) {
+                clearInterval(stepInterval);
+                loadingSection.classList.add('hidden');
+                errorContainer.querySelector('p').textContent = `Analysis Failed: ${error.message}`;
+                errorContainer.classList.remove('hidden');
+                uploadSection.classList.remove('hidden');
+            }
+        });
+
+        function displayResults(data) {
+            resultsContainer.innerHTML = `
+                <div class="dashboard-header">
+                    <h2>Analysis Dashboard</h2>
+                    <button id="new-analysis-btn">Analyze New Resume</button>
+                </div>
+                <div class="results-grid">
+                    <div class="info-card">
+                        <h3>Candidate Profile</h3>
+                        <p><strong>Name:</strong> ${data.basic_info.name}</p>
+                        <p><strong>Email:</strong> ${data.basic_info.email}</p>
+                        <p><strong>Phone:</strong> ${data.basic_info.phone}</p>
+                        <p><strong>Pages:</strong> ${data.basic_info.pages}</p>
+                    </div>
+                    <div class="score-card">
+                        <h3>Match Score</h3>
+                        <p>${data.similarity_score}%</p>
+                        <small>Semantic similarity with JD</small>
+                    </div>
+                    <div class="info-card">
+                        <h3>Language Sentiment</h3>
+                        <p class="sentiment-${data.sentiment.label.toLowerCase().replace(' ', '')}">${data.sentiment.label}</p>
+                        <small>${data.sentiment.description}</small>
+                    </div>
+                </div>
+
+                <div class="results-section">
+                    <h3>Skills Analysis</h3>
+                    <div class="results-grid">
+                        <div class="skills-card">
+                            <h4>✅ Current Skills</h4>
+                            <div class="skill-list">${data.resume_skills.length > 0 ? data.resume_skills.map(s => `<span>${s}</span>`).join('') : '<p>No specific technical skills found.</p>'}</div>
+                        </div>
+                        <div class="skills-card">
+                            <h4>❌ Skill Gaps (from JD)</h4>
+                            <div class="skill-list">${data.missing_skills.length > 0 ? data.missing_skills.map(s => `<span>${s}</span>`).join('') : '<p>No skill gaps identified.</p>'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-section">
+                    <h3>Advanced Analysis</h3>
+                    <div class="results-grid">
+                        <div class="info-card">
+                            <h4>Key Experience Themes</h4>
+                            <div class="topic-list">
+                                ${data.experience_topics.length > 0 ? data.experience_topics.map(topic => `<div class="topic-tag">${topic}</div>`).join('') : '<p>Not enough text for topic analysis.</p>'}
+                            </div>
+                        </div>
+                        <div class="info-card">
+                            <h4>Key Concepts Found</h4>
+                            <div class="skill-list">${data.key_concepts.length > 0 ? data.key_concepts.map(c => `<span>${c}</span>`).join('') : '<p>No key concepts extracted.</p>'}</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-section wide-card">
+                    <h3>Interactive Skill Network</h3>
+                    <div id="skill-network"></div>
+                </div>
+                
+                <div class="results-section">
+                    <h3>AI-Powered Resume Feedback</h3>
+                    <ul class="feedback-list">${data.feedback_tips.map(tip => `<li>${tip}</li>`).join('')}</ul>
+                </div>
+            `;
+
+            const newAnalysisBtn = document.getElementById('new-analysis-btn');
+            newAnalysisBtn.addEventListener('click', () => {
+                resultsContainer.classList.add('hidden');
+                uploadSection.classList.remove('hidden');
+                form.reset();
+            });
+            
+            renderSkillNetwork(data.skill_network);
+        }
+    </script>
+</body>
+</html>
