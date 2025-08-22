@@ -13,7 +13,10 @@ instance/
 *.sqlite3
 
 # Environment variables file (sensitive)
-.env
 
 # VS Code settings
 .vscode/
+config.bat
+node_modules
+temp_auto_push.bat
+temp_interactive_push.bat
